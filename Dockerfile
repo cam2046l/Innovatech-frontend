@@ -19,12 +19,11 @@ RUN npm run build
 # Aquí usamos Nginx (recomendable la versión unprivileged por seguridad)
 FROM nginxinc/nginx-unprivileged:alpine
 
-# Copiamos la build terminada desde la Etapa 1 hacia la carpeta de Nginx
+# 🚀 LÍNEA CLAVE NUEVA: Reemplaza la configuración por defecto de Nginx con tu puente proxy
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copiamos la compilación estática de la etapa 1
 COPY --from=build /app/dist /usr/share/nginx/html 
-# (NOTA: Cambia /app/dist por /app/build si usaste Create React App)
 
-# Exponemos el puerto
-EXPOSE 80
-
-# Arrancamos Nginx
+EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
