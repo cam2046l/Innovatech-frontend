@@ -47,11 +47,11 @@ jobs:
         aws ssm send-command \
           --instance-ids "${{ env.EC2_INSTANCE_ID }}" \
           --document-name "AWS-RunShellScript" \
-          --comment "Despliegue automatico del Frontend" \
-          --parameters commands=[ \
-            "aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY", \
-            "docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG", \
-            "docker stop frontend-citt || true", \
-            "docker rm frontend-citt || true", \
-            "docker run -d --name frontend-citt -p 80:80 --restart always $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" \
-          ]
+          --comment "Despliegue Frontend" \
+          --parameters "commands=[
+            \"aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin $ECR_REGISTRY\",
+            \"sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\",
+            \"sudo docker stop frontend-citt || true\",
+            \"sudo docker rm frontend-citt || true\",
+            \"sudo docker run -d --name frontend-citt -p 80:80 --restart always $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\"
+          ]"
