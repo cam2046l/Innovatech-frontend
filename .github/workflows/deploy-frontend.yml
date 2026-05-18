@@ -53,5 +53,5 @@ jobs:
             \"sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\",
             \"sudo docker stop frontend-citt || true\",
             \"sudo docker rm frontend-citt || true\",
-            \""sudo docker run -d --name frontend-citt -p 80:8080 --restart always $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"\"
+            \"sudo docker run -d --name frontend-citt -p 80:8080 --restart always $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\"
           ]"
