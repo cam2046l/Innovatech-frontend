@@ -1,25 +1,30 @@
-# 1. Fase de construcción
-FROM nginxinc/nginx-unprivileged:alpine AS build
+# ETAPA 1: Construcción (Build)
+# Aquí usamos la imagen de Node que SÍ tiene 'npm'
+FROM node:18-alpine AS build 
+
 WORKDIR /app
+
+# Copiamos los archivos de dependencias
 COPY package*.json ./
+
+# Instalamos dependencias (Aquí ya no fallará porque estamos en node)
 RUN npm install
+
+# Copiamos el resto del código y construimos la app
 COPY . .
 RUN npm run build
 
-# 2. Fase de ejecución (Nginx)
-FROM nginx:stable-alpine
-# Copiamos el build de Vite
-COPY --from=build /app/dist /usr/share/nginx/html
 
-# OPCIONAL: Configuración para que React Router funcione al refrescar la página
-RUN echo 'server { \
-    listen 80; \
-    location / { \
-        root /usr/share/nginx/html; \
-        index index.html index.htm; \
-        try_files $uri $uri/ /index.html; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
+# ETAPA 2: Producción (Servidor Web)
+# Aquí usamos Nginx (recomendable la versión unprivileged por seguridad)
+FROM nginxinc/nginx-unprivileged:alpine
 
+# Copiamos la build terminada desde la Etapa 1 hacia la carpeta de Nginx
+COPY --from=build /app/dist /usr/share/nginx/html 
+# (NOTA: Cambia /app/dist por /app/build si usaste Create React App)
+
+# Exponemos el puerto
 EXPOSE 80
+
+# Arrancamos Nginx
 CMD ["nginx", "-g", "daemon off;"]
