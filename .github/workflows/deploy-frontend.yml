@@ -1,57 +1,46 @@
-name: Deploy Frontend to Amazon ECR and EC2
-#prueba 8
+name: Deploy Innovatech Frontend to EKS
+
 on:
   push:
     branches:
-      - deploy
+      - deploy # Cambia esto si usas la rama main o master
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: innovatech-front
-  EC2_INSTANCE_ID: i-09c9d70c1fcfa818a
+  EKS_CLUSTER_NAME: devopseks
+  ECR_REGISTRY: 137700910242.dkr.ecr.us-east-1.amazonaws.com
 
 jobs:
   build-and-deploy:
-    name: Build, Push and Deploy
+    name: Build, Push & Deploy Frontend to EKS
     runs-on: ubuntu-latest
-
     steps:
-    - name: 1. Checkout del código
-      uses: actions/checkout@v3
+      - name: 1. Checkout del código
+        uses: actions/checkout@v3
 
-    - name: 2. Configurar credenciales de AWS (Academy)
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-        aws-region: ${{ env.AWS_REGION }}
+      - name: 2. Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: 3. Login en Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: 3. Login en Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: 4. Construir, etiquetar y subir imagen a ECR
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: latest
-      run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: 4. Construir y Subir Imagen a ECR
+        run: |
+          # OJO: Si tu Dockerfile no está en la raíz, agrega un 'cd nombre-carpeta' antes
+          docker build -t ${{ env.ECR_REGISTRY }}/innovatech-frontend:latest -f Dockerfile .
+          docker push ${{ env.ECR_REGISTRY }}/innovatech-frontend:latest
 
-    - name: 5. Desplegar en EC2 pública vía AWS SSM
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: latest
-      run: |
-        aws ssm send-command \
-          --instance-ids "${{ env.EC2_INSTANCE_ID }}" \
-          --document-name "AWS-RunShellScript" \
-          --comment "Despliegue Frontend" \
-          --parameters "commands=[
-            \"aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin $ECR_REGISTRY\",
-            \"sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\",
-            \"sudo docker stop frontend-citt || true\",
-            \"sudo docker rm frontend-citt || true\",
-            \"sudo docker run -d --name frontend-citt -p 80:8080 --restart always $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\"
-          ]"
+      - name: 5. Conectar GitHub Actions al Clúster EKS
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+      - name: 6. Desplegar Frontend en Kubernetes
+        run: |
+          kubectl apply -f ./k8s/
+          kubectl rollout restart deployment/frontend-deployment
