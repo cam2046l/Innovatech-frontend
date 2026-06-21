@@ -16,7 +16,7 @@ spec:
       - name: frontend
         image: 137700910242.dkr.ecr.us-east-1.amazonaws.com/innovatech-frontend:latest
         ports:
-        - containerPort: 80
+        - containerPort: 8080 
 ---
 apiVersion: v1
 kind: Service
@@ -24,9 +24,8 @@ metadata:
   name: frontend-service
 spec:
   ports:
-  - port: 80
-    targetPort: 80
+  - port: 80         
+    targetPort: 8080 
   selector:
     app: frontend
-  type: LoadBalancer 
-  #prueba de comentario para ver si se actualiza el yaml en el repositorio
+  type: LoadBalancer
