@@ -1,5 +1,5 @@
 name: Deploy Frontend to Amazon ECR and EC2
-#prueba 1
+#prueba 8
 on:
   push:
     branches:
