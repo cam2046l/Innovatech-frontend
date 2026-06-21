@@ -24,21 +24,24 @@ export const FormDespacho = ({ venta, onClose }) => {
     console.log("Datos del formulario:", jsonData);
 
     try {
+      // PRIMERA PETICIÓN (Actualizar Venta)
       await axios.put(
-        `${API_URL}/api/v1/ventas/${venta.idVenta}`,
+        `/api/v1/ventas/${venta.idVenta}`,
         jsonDataSales,
         {
           headers:{
             'Content-Type': 'application/json',
             'Accept': 'application/json'
-      }
+          }
         }
       );
-      await axios.post(`${API_URL}/api/v1/despachos`, jsonData, {
+
+      // SEGUNDA PETICIÓN (Crear Despacho)
+      await axios.post(`/api/v1/despachos`, jsonData, { 
         headers:{
           'Content-Type': 'application/json',
           'Accept': 'application/json'
-    }
+        }
       });
       Swal.fire({
         title: "Despacho registrado 🛻!",
