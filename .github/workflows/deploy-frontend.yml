@@ -8,7 +8,7 @@ on:
 env:
   AWS_REGION: us-east-1
   EKS_CLUSTER_NAME: devopseks
-  ECR_REGISTRY: 137700910242.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REGISTRY: 522965979796.dkr.ecr.us-east-1.amazonaws.com
 
 jobs:
   build-and-deploy:
