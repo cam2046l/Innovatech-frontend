@@ -32,9 +32,9 @@ jobs:
 
       - name: 4. Construir y Subir Imagen a ECR
         run: |
-          # OJO: Si tu Dockerfile no está en la raíz, agrega un 'cd nombre-carpeta' antes
-          docker build -t ${{ env.ECR_REGISTRY }}/innovatech-frontend:latest -f Dockerfile .
-          docker push ${{ env.ECR_REGISTRY }}/innovatech-frontend:latest
+          docker build -t ${{ env.ECR_REGISTRY }}/innovatech-frontend:${{ github.sha }} -t ${{ env.ECR_REGISTRY }}/innovatech-frontend:latest -f Dockerfile .
+          docker push ${{ env.ECR_REGISTRY }}/innovatech-frontend:${{ github.sha }}
+          docker push ${{ env.ECR_REGISTRY }}/innovatech-frontend:lates
 
       - name: 5. Conectar GitHub Actions al Clúster EKS
         run: |
