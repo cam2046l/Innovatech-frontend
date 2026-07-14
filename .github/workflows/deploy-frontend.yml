@@ -34,7 +34,7 @@ jobs:
         run: |
           docker build -t ${{ env.ECR_REGISTRY }}/innovatech-frontend:${{ github.sha }} -t ${{ env.ECR_REGISTRY }}/innovatech-frontend:latest -f Dockerfile .
           docker push ${{ env.ECR_REGISTRY }}/innovatech-frontend:${{ github.sha }}
-          docker push ${{ env.ECR_REGISTRY }}/innovatech-frontend:lates
+          docker push ${{ env.ECR_REGISTRY }}/innovatech-frontend:latest
 
       - name: 5. Conectar GitHub Actions al Clúster EKS
         run: |
