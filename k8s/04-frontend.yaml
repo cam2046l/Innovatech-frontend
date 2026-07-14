@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: 522965979796.dkr.ecr.us-east-1.amazonaws.com/innovatech-frontend:latest
+        image: 522965979796.dkr.ecr.us-east-1.amazonaws.com/innovatech-frontend:latest #cambio uri
         ports:
         - containerPort: 8080 
 ---
